@@ -56,7 +56,7 @@ ABB insertar(int elem, ABB a) {
 
 // Fin de la implementacion
 
-int arreglo[10000003];
+int* arreglo;
 
 //Se va lo mas a la izquierda posible (al mas pequeño posible)
 //se agrega el numero al arreglo y despues con el backtracking recursivo
@@ -118,12 +118,15 @@ int main(int argc, char* argv[]) {
     int numeroDeNumeros, i;
 
     numeroDeNumeros = atoi(argv[1]);
+    arreglo = (int*)malloc(sizeof(int) * numeroDeNumeros);
 
     leerArreglo(numeroDeNumeros);
 
     ABB arbol = insertarArregloEnArbol(numeroDeNumeros);
 
     obtenerArreglo(arbol);
+
+    imprimirArreglo(numeroDeNumeros);
 
     checaOrdenamiento(numeroDeNumeros);
 
