@@ -11,7 +11,8 @@ typedef struct Nodo {
 }*ABB;
 
 //Aqui creamos un nuevo nodo cuando es necesario
-//asignamos el espacio de memoria, el numero y sus hijos nulos
+//asignamos el espacio de memoria, el numero y sus hijos nulos}
+//se recibe un el numero a insertar
 ABB nuevoNodo(int elem) {
     ABB nuevo = (ABB)malloc(sizeof(struct Nodo));
     nuevo->numero = elem;
