@@ -127,7 +127,7 @@ int main(int argc, char* argv[]) {
 
     obtenerArreglo(arbol);
 
-    imprimirArreglo(numeroDeNumeros);
+    // imprimirArreglo(numeroDeNumeros);
 
     checaOrdenamiento(numeroDeNumeros);
 
