@@ -1,12 +1,12 @@
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-#include "Arbol.h"
+#include<bits/stdc++.h>
+#include<stdlib.h>
+#include "Arbol.hpp"
+
+using namespace std;
 
 int codes[256];
-FILE *external;
 
-void traverseInOrder(Node root, int str) {
+void traverseInOrder(BT root, int str) {
     if (root != NULL) {
         int aux = 2 * str;
         traverseInOrder(root->izq, aux);
@@ -16,19 +16,43 @@ void traverseInOrder(Node root, int str) {
         traverseInOrder(root->right, aux + 1);
     }
 }
+
+void escribeBytes(string a) {
+    ofstream wf("codificacion.dat", ios::out | ios::binary);
+    while(a.size()%8!=0)a+="0";
+    for(int i=0;i<a.size(); i+=8) {
+        unsigned char b[1];
+        b[0] = 0;
+        for(int j = i; j<i+8;j++){
+            b[0] *= 2;
+            b[0] += (a[j] == '1');
+            printf("%d %d  ",(a[j] == '1'), b[0] );
+        }
+
+        cout<<endl;
+        printf("%d  ", b[0] );
+        cout<<endl;
+        wf.write((char *)b, sizeof(char));
+    }
+    wf.close();
+}
+
 int first;
+string s;
 void printDecToBin(int dec) {
     if (dec == 0)
         return ;
     printDecToBin(dec >> 1);
     if(!first)
-        fprintf(external, "%d", dec&1);
+        s += to_string(dec&1);
     else first = 0;
 }
 
-void printBin(int x) {
+string printBin(int x) {
     first = 1;
+    s = "";
     printDecToBin(x);
+    return s;
 }
 
 int main(int argc, char* argv[]) {
@@ -41,13 +65,13 @@ int main(int argc, char* argv[]) {
         fprintf(stderr, "Error: file open failed '%s'.\n", argv[1]);
         return 1;
     }
-    unsigned char* buf = malloc(sizeof(unsigned char));
-    if (!buf) {
+    unsigned char* buf = new unsigned char();
+    if (!buf) {    
         perror("Error: buf memory allocation failed");
         return 1;
     }
-    size_t bytes = 0;                    //bytes read
-    unsigned int frequencies[256]; //hash map
+    size_t bytes = 0;
+    unsigned int frequencies[256];
     memset(frequencies, 0, 256*sizeof(int));
     while ((bytes = fread(buf, sizeof(*buf), 1, fp)) == 1) {
         printf("%d\t", *buf);
@@ -71,40 +95,57 @@ int main(int argc, char* argv[]) {
     for (j = 0; j < elementsSize; j++) {
         printf("%c\t%d\t%d\n", elements[j][0], elements[j][0], elements[j][1]);
     }
-    Node tree = createTree(elements, elementsSize);
+    BT tree = createTree(elements, elementsSize);
     memset(codes, -1, 256 * sizeof(int));
     traverseInOrder(tree, 1);
 
-    external = fopen("frecuencias.txt","w");    
+
     for (j = 0; j < 256; j++) {
         if (codes[j] != -1) {
             printf("c:%c  %d: code: ",j , j);
-            fprintf(external, "%d ",j);
-            printBin(codes[j]);
-            fprintf(external,"\n");
-            printf("\n");
+            cout<<printBin(codes[j])<<endl;
         }
     }
-    fclose(external);
 
     fp = fopen(argv[1], "rb"); //open file in binary read
     if (!fp) {
         fprintf(stderr, "Error: file open failed '%s'.\n", argv[1]);
         return 1;
     }
-    external = fopen("codificacion.dat", "w");    
-    buf = malloc(sizeof(char));
+
+    /* FILE *external;
+    external = fopen("codificacion.dat", "wb");    */
+
+    buf = new unsigned char();
     if (!buf) {
         perror("Error: buf memory allocation failed");
         return 1;
     }
     bytes = 0;                    //bytes read
-    printf("\n");
+    
+    string fin = "";
     while ((bytes = fread(buf, sizeof(*buf), 1, fp)) == 1) {
-        printBin(codes[*buf]);
+        fin += printBin(codes[*buf]);
     }
-    fclose(external);
+    //fclose(external);
+    cout<<fin<<endl;
+    escribeBytes(fin);
     fclose(fp);
     free(buf);
+
+
+    ifstream rf("codificacion.dat", ios::out | ios::binary);
+    if(!rf) {
+        cout << "Cannot open file!" << endl;
+        return 1;
+    }
+    unsigned char rstu[4];
+    for(int i = 0; i < 4; i++){
+        rf.read((char *) &rstu[i], sizeof(unsigned char));
+        printf("%d ", rstu[i]);
+    }
+    rf.close();
+    
+
     return 0;
 }
