@@ -19,32 +19,45 @@ void traverseInOrder(BT root, int str) {
 
 void escribeBytes(string a) {
     ofstream wf("codificacion.dat", ios::out | ios::binary);
-    while(a.size()%8!=0)a+="0";
-    for(int i=0;i<a.size(); i+=8) {
+    while (a.size() % 8 != 0)a += "0";
+    for (int i = 0;i < a.size(); i += 8) {
         unsigned char b[1];
         b[0] = 0;
-        for(int j = i; j<i+8;j++){
+        for (int j = i; j < i + 8;j++) {
             b[0] *= 2;
             b[0] += (a[j] == '1');
-            printf("%d %d  ",(a[j] == '1'), b[0] );
+            //printf("%d %d  ", (a[j] == '1'), b[0]);
         }
 
-        cout<<endl;
-        printf("%d  ", b[0] );
-        cout<<endl;
-        wf.write((char *)b, sizeof(char));
+        //cout << endl;
+        //printf("%d  ", b[0]);
+        //cout << endl;
+        wf.write((char*)b, sizeof(char));
     }
     wf.close();
+}
+string getExtention(string a) {
+    string ans = "";
+    bool flag = false;
+    for (char i : a) {
+        if (i == '.') {
+            flag = true;
+        }
+        if (flag) {
+            ans += i;
+        }
+    }
+    return ans;
 }
 
 int first;
 string s;
 void printDecToBin(int dec) {
     if (dec == 0)
-        return ;
+        return;
     printDecToBin(dec >> 1);
-    if(!first)
-        s += to_string(dec&1);
+    if (!first)
+        s += to_string(dec & 1);
     else first = 0;
 }
 
@@ -66,21 +79,21 @@ int main(int argc, char* argv[]) {
         return 1;
     }
     unsigned char* buf = new unsigned char();
-    if (!buf) {    
+    if (!buf) {
         perror("Error: buf memory allocation failed");
         return 1;
     }
     size_t bytes = 0;
     unsigned int frequencies[256];
-    memset(frequencies, 0, 256*sizeof(int));
+    memset(frequencies, 0, 256 * sizeof(int));
     while ((bytes = fread(buf, sizeof(*buf), 1, fp)) == 1) {
-        printf("%d\t", *buf);
+        //printf("%d\t", *buf);
         frequencies[*buf]++;
     }
     fclose(fp);
     //reduce hash map
     unsigned int elements[256][2], elementsSize;
-    memset(elements, 0, 256*2*sizeof(int));
+    memset(elements, 0, 256 * 2 * sizeof(int));
     int i, j;
     for (i = 0, j = 0; i < 256; i++) {
         if (frequencies[i] != 0) {
@@ -89,24 +102,21 @@ int main(int argc, char* argv[]) {
             j++;
         }
     }
-    printf("\n");
     elementsSize = j;
 
-    for (j = 0; j < elementsSize; j++) {
-        printf("%c\t%d\t%d\n", elements[j][0], elements[j][0], elements[j][1]);
-    }
     BT tree = createTree(elements, elementsSize);
     memset(codes, -1, 256 * sizeof(int));
     traverseInOrder(tree, 1);
 
-
-    for (j = 0; j < 256; j++) {
-        if (codes[j] != -1) {
-            printf("c:%c  %d: code: ",j , j);
-            cout<<printBin(codes[j])<<endl;
-        }
+    ofstream external;
+    external.open("frecuencias.txt");
+    external<<elementsSize<<endl;
+    for (j = 0; j < elementsSize; j++) {
+        //printf("%c\t%d\t%d\n", elements[j][0], elements[j][0], elements[j][1]);
+        external<<elements[j][0]<<" "<<elements[j][1]<<endl;
     }
-
+    external<<getExtention(argv[1]);
+    external.close();
     fp = fopen(argv[1], "rb"); //open file in binary read
     if (!fp) {
         fprintf(stderr, "Error: file open failed '%s'.\n", argv[1]);
@@ -122,30 +132,16 @@ int main(int argc, char* argv[]) {
         return 1;
     }
     bytes = 0;                    //bytes read
-    
+
     string fin = "";
     while ((bytes = fread(buf, sizeof(*buf), 1, fp)) == 1) {
         fin += printBin(codes[*buf]);
     }
     //fclose(external);
-    cout<<fin<<endl;
+    cout << fin << endl;
     escribeBytes(fin);
     fclose(fp);
     free(buf);
-
-
-    ifstream rf("codificacion.dat", ios::out | ios::binary);
-    if(!rf) {
-        cout << "Cannot open file!" << endl;
-        return 1;
-    }
-    unsigned char rstu[4];
-    for(int i = 0; i < 4; i++){
-        rf.read((char *) &rstu[i], sizeof(unsigned char));
-        printf("%d ", rstu[i]);
-    }
-    rf.close();
-    
 
     return 0;
 }
