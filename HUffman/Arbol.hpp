@@ -30,8 +30,8 @@ BT createNode(int item, int cnt, BT lft, BT rght) {
     return node;
 }
 
-BT createTree(unsigned int arr[][2], int n) {
-    multiset<pair<unsigned int, BT> > ms;
+BT createTree(vector<pair<int,int>> vp) {
+    /* multiset<pair<unsigned int, BT> > ms;
     ms.clear();
     for (int i = 0; i < n; i++){
         ms.insert({arr[i][1] ,createNode(arr[i][0], arr[i][1], NULL, NULL)});
@@ -43,5 +43,30 @@ BT createTree(unsigned int arr[][2], int n) {
         ms.erase(y);
         ms.insert({x.first + y.first, createNode(NO_ITEM, NO_COUNT, y.second, x.second)});
     }
-    return (*ms.begin()).second;
+    return (*ms.begin()).second; */
+    vector<BT> nodeArr;
+    for (int i = 0; i < vp.size(); i++) {
+        nodeArr.push_back(createNode(vp[i].first, vp[i].second, NULL, NULL));
+    }
+    int lowest1, lowest2, index1, index2;
+    for (int j = 0; j < nodeArr.size()-1; j++) {
+        lowest1 = lowest2 = index1 = index2 = INT_MAX;
+        for (int i = 0; i < nodeArr.size(); i++) {
+            if (nodeArr[i]->count < lowest1) {
+                lowest2 = lowest1;
+                index2 = index1;
+                lowest1 = nodeArr[i]->count;
+                index1 = i;
+            } else if (nodeArr[i]->count < lowest2) {
+                lowest2 = nodeArr[i]->count;
+                index2 = i;
+            }
+        }
+        nodeArr.push_back(createNode(NO_ITEM, NO_COUNT, nodeArr[index1], nodeArr[index2]));
+        nodeArr[index1]->count = nodeArr[index2]->count = INT_MAX;
+    }
+    for(BT node : nodeArr) {
+        if (node->key == NO_ITEM) return node;
+    }
+    return 0;
 }

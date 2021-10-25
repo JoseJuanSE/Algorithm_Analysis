@@ -7,66 +7,72 @@ using namespace std;
 int main() {
 
     int numElems = 0;
+    vector<pair<int,int>> elements;
+    int elementsSize;
 
     ifstream frecFile;
     frecFile.open("frecuencias.txt");
-    unsigned int elements[256][2], elementsSize;
-    memset(elements, 0, 256 * 2 * sizeof(int));
     frecFile >> elementsSize;
     for (int i = 0; i < elementsSize; i++) {
         int a, b;
         frecFile >> a >> b;
-        elements[i][0] = a;
-        elements[i][1] = b;
+        elements.push_back({a, b});
         numElems += b;
     }
-    cout<<numElems<<endl;
+    
     string extencion;
     frecFile >> extencion;
     frecFile.close();
-    BT tree = createTree(elements, elementsSize);
+    
+    BT tree = createTree(elements);
 
     ifstream encoded;
     encoded.open("codificacion.dat");
+    string str;
     BT curr = tree;
 
     ofstream descom;
     descom.open("descompresed" + extencion);
     bool flag = false;
-    while (!encoded.eof()) {
-        unsigned char byte;
-        encoded >> byte;
-        for (int i = 0;i < 8;i++) {
+    while (getline(encoded, str)) {
+        for(unsigned char byte: str){
+            for (int i = 0;i < 8;i++) {
+                //cout<<numElems<<endl;
+                if (curr->key != NO_ITEM) {
+                    numElems--;
+                    if (numElems < 0) {
+                        flag = true;
+                        break;
+                    }
+                    descom << (unsigned char)curr->key;
+                    curr = tree;
+                }
+                /* bool aaa = (byte & (1 << (8 - i -1)));
+                cout<<aaa; */
 
-            if (curr->key != NO_ITEM) {
-                numElems--;
-                if (numElems < 0) {
-                    flag = true;
-                    break;
+                if (curr->key == NO_ITEM) {
+                    if (byte & (1 << (8 - i -1))) {
+                        curr = curr -> right;
+                    } else {
+                        curr = curr -> izq;
+                    }
                 }
-                descom << (char)curr->key;
-                curr = tree;
-            }
+                
+                if (curr->key != NO_ITEM) {
+                    numElems--;
+                    if (numElems < 0) {
+                        flag = true;
+                        break;
+                    }
+                    descom << (unsigned char)curr->key;
+                    curr = tree;
+                }
+                //cout<<numElems<<endl;
 
-            if (curr->key == NO_ITEM) {
-                if (byte & (1 << (8 - i -1))) {
-                    curr = curr -> right;
-                } else {
-                    curr = curr -> izq;
-                }
             }
-            
-            if (curr->key != NO_ITEM) {
-                numElems--;
-                if (numElems < 0) {
-                    flag = true;
-                    break;
-                }
-                descom << (char)curr->key;
-                curr = tree;
-            }
+            //cout<<endl;
+            if (flag)break;
         }
-        if (flag)break;
     }
 
     descom.close();
