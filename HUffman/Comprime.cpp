@@ -64,11 +64,11 @@ int main(int argc, char* argv[]) {
     //Se crea el archivo de frecuencias
     ofstream external;
     external.open("frecuencias.txt");
-    for (int  i = 0; i < 256; i++) {
-        external<<frecuencias[i]<<endl; 
+    for (int i = 0; i < 256; i++) {
+        external << frecuencias[i] << endl;
     }
     //Se le agrega la extension del archivo original
-    external<<getExtention(argv[1]);
+    external << getExtention(argv[1]);
     external.close();
 
     //Se crea el arbol

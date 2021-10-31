@@ -5,16 +5,16 @@ using namespace std;
 
 string getExtention(string a) {
     return a.substr(a.find_last_of("."));
-}   
+}
 
 int main(int argc, char* argv[]) {
     //validamos los parametros
     if (argc != 3 || getExtention(argv[1]) != ".txt" || getExtention(argv[2]) != ".dat") {
         if (argc != 3) {
             cout << "Error: Cantidad de argumentos invalida" << endl;
-        } else if(getExtention(argv[1]) != ".txt") {
+        } else if (getExtention(argv[1]) != ".txt") {
             cout << "Error: El archivo de texto debe ser .txt" << endl;
-        } else if(getExtention(argv[2]) != ".dat") {
+        } else if (getExtention(argv[2]) != ".dat") {
             cout << "Error: El archivo de datos debe ser .dat" << endl;
         }
         cout << "Pasa de forma correcta los parametros";
@@ -39,7 +39,7 @@ int main(int argc, char* argv[]) {
     frecFile.close();
 
     //Se abre el archivo comprimido
-    FILE *archivoAComprimir = fopen(argv[2], "rb");
+    FILE* archivoAComprimir = fopen(argv[2], "rb");
     if (archivoAComprimir == NULL) {
         cout << "No se pudo abrir el archivo";
         return 1;
@@ -59,7 +59,7 @@ int main(int argc, char* argv[]) {
 
     //Se decodifica el archivo y se guarda en ans
     vector<unsigned char> ans;
-    for(unsigned char byte : Buf) {
+    for (unsigned char byte : Buf) {
         for (int i = 7; i >= 0; i--) {
             if (curr->left == NULL && curr->right == NULL) {
                 ans.push_back(curr->character);
