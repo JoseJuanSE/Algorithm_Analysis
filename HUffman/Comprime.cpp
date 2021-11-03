@@ -15,26 +15,35 @@ void traverseTree(BT root, string str) {
     }
 }
 
-void writeBytes(string str) {
-    //Transformamos los 0 y 1 de string a bits reales
-    //los cuales se escriben en el archivo .dat
-    FILE* wf = fopen("codificacion.dat", "wb");
-    while (str.size() % 8 != 0)str += "0";
-    vector<unsigned char> buffer;
-    for (int i = 0; i < str.size(); i += 8) {
-        unsigned char b = 0;
-        for (int j = i; j < i + 8;j++) {
-            b *= 2;
-            b += (str[j] == '1');
-        }
-        buffer.push_back(b);
-    }
-    fwrite(&buffer[0], sizeof(unsigned char), buffer.size(), wf);
-    fclose(wf);
-}
-
 string getExtention(string a) {
     return a.substr(a.find_last_of("."));
+}
+
+void writeBytes(vector<unsigned char> &Buf) {
+    FILE* wf = fopen("codificacion.dat", "wb");
+    vector<unsigned char> buffer;
+    int k = 0;
+    string miniBuf = "";
+    while (k < Buf.size()) {
+        while (miniBuf.size() < 8) {
+            miniBuf += codes[Buf[k++]];
+            if (k == Buf.size()) {
+                while (miniBuf.size() % 8 != 0) {
+                    miniBuf += '0';
+                }
+                break;
+            }
+        }
+        unsigned char b = 0;
+        for (int j = 0; j < 8;j++) {
+            b *= 2;
+            b += (miniBuf[j] == '1');
+        }
+        buffer.push_back(b);
+        miniBuf = miniBuf.substr(8);
+    }
+    fwrite(&buffer[0], sizeof(unsigned char), buffer.size(), wf);
+    fclose(wf); 
 }
 
 int main(int argc, char* argv[]) {
@@ -57,7 +66,6 @@ int main(int argc, char* argv[]) {
 
     //Se crea la tabla de frecuencias
     vector<int> frecuencias(256, 0);
-
     for (unsigned char i : Buf) {
         frecuencias[(int)i]++;
     }
@@ -76,12 +84,7 @@ int main(int argc, char* argv[]) {
     //Se obtienen las codificaciones
     traverseTree(tree, "");
 
-    //Se codifica el archivo
-    string finalFile = "";
-    for (unsigned char i : Buf) {
-        finalFile += codes[(int)i];
-    }
     //Se escribe el archivo codificado
-    writeBytes(finalFile);
+    writeBytes(Buf);
     return 0;
 }
