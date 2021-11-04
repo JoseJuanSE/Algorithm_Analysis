@@ -3,10 +3,12 @@
 
 using namespace std;
 
+//En esta funcion se pasa el nombre de un archivo y regresa la extension
 string getExtention(string a) {
     return a.substr(a.find_last_of("."));
 }
 
+//Le pasamos el el archivo de frecuencias y el comprimido
 int main(int argc, char* argv[]) {
     //validamos los parametros
     if (argc != 3 || getExtention(argv[1]) != ".txt" || getExtention(argv[2]) != ".dat") {
